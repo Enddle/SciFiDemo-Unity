@@ -11,12 +11,36 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
         Controller = GetComponent<CharacterController>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+        if (Input.GetMouseButtonDown(0)) {
+
+            // Ray rayOrigin = Camera.main.ScreenPointToRay(new Vector3(Screen.width/2, Screen.height/2, 0));
+            // points to the middle of the screen
+
+            Ray rayOrigin = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+
+            // if (Physics.Raycast(rayOrigin, Mathf.Infinity)) {
+                
+            RaycastHit hitInfo;
+            if (Physics.Raycast(rayOrigin, out hitInfo)) {
+
+                Debug.Log("Hit something:" + hitInfo.collider);
+            }
+        }
+
         Movement();
     }
 
