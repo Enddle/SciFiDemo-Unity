@@ -4,9 +4,13 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+
     private CharacterController Controller = null;
     private float speed = 5.0f;
     private float gravity = 9.81f;
+    [SerializeField] private GameObject muzzleFlash = null;
+    [SerializeField] private GameObject hitMarker = null;
+    [SerializeField] private AudioSource weaponSound = null;
 
     // Start is called before the first frame update
     void Start()
@@ -25,7 +29,11 @@ public class Player : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
 
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButton(0)) {
+
+            muzzleFlash.SetActive(true);
+
+            if (!weaponSound.isPlaying) weaponSound.Play();
 
             // Ray rayOrigin = Camera.main.ScreenPointToRay(new Vector3(Screen.width/2, Screen.height/2, 0));
             // points to the middle of the screen
@@ -38,7 +46,17 @@ public class Player : MonoBehaviour
             if (Physics.Raycast(rayOrigin, out hitInfo)) {
 
                 Debug.Log("Hit something:" + hitInfo.collider);
+
+                GameObject hit = Instantiate(hitMarker, hitInfo.point, Quaternion.LookRotation(hitInfo.normal));
+                    // get hit memory address
+                
+                Destroy(hit, 2.0f);
             }
+        } else {
+            
+            muzzleFlash.SetActive(false);
+
+            weaponSound.Stop();
         }
 
         Movement();
