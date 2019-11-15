@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject muzzleFlash = null;
     [SerializeField] private GameObject hitMarker = null;
     [SerializeField] private AudioSource weaponSound = null;
+    [SerializeField] private int currentAmmo = 0;
+    private int maxAmmo = 50;
+    private bool isReloading = false;
+    private UIManager UI = null;
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +24,10 @@ public class Player : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         Controller = GetComponent<CharacterController>();
+        
+        currentAmmo = maxAmmo;
+
+        UI = GameObject.Find("Canvas").GetComponent<UIManager>();
     }
 
     // Update is called once per frame
@@ -29,7 +38,38 @@ public class Player : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
 
-        if (Input.GetMouseButton(0)) {
+        Shoot();
+        
+        if (Input.GetKeyDown(KeyCode.R) && !isReloading) {
+
+            StartCoroutine(Reload());
+        }
+
+        Movement();
+    }
+
+    private void Movement() {
+
+        Vector3 Direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        Vector3 Velocity = Direction * speed;
+        Velocity.y -= gravity;
+
+        // change from local to global space
+        Velocity = transform.transform.TransformDirection(Velocity);
+            // transform - player
+            // transform - world
+            // method - conversion
+
+        Controller.Move(Velocity * Time.deltaTime);
+    }
+
+    private void Shoot() {
+
+        if (Input.GetMouseButton(0) && currentAmmo > 0) {
+
+            currentAmmo--;
+
+            UI.UpdateAmmo(currentAmmo);
 
             muzzleFlash.SetActive(true);
 
@@ -58,22 +98,15 @@ public class Player : MonoBehaviour
 
             weaponSound.Stop();
         }
-
-        Movement();
     }
 
-    private void Movement() {
+    private IEnumerator Reload() {
 
-        Vector3 Direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
-        Vector3 Velocity = Direction * speed;
-        Velocity.y -= gravity;
+        isReloading = true;
+        yield return new WaitForSeconds(1.5f);
 
-        // change from local to global space
-        Velocity = transform.transform.TransformDirection(Velocity);
-            // transform - player
-            // transform - world
-            // method - conversion
-
-        Controller.Move(Velocity * Time.deltaTime);
+        currentAmmo = maxAmmo;
+        UI.UpdateAmmo(currentAmmo);
+        isReloading = false;
     }
 }
