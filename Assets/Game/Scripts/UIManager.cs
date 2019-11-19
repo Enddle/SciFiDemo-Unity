@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     [SerializeField] private Text AmmoField = null;
+    [SerializeField] GameObject coin = null;
 
     // Start is called before the first frame update
     void Start()
@@ -22,5 +23,10 @@ public class UIManager : MonoBehaviour
     public void UpdateAmmo(int ammo) {
         
         AmmoField.text = "Ammo  " + ammo;
+    }
+
+    public void CollectedCoin() {
+        
+        coin.SetActive(true);
     }
 }

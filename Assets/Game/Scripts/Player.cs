@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
     private bool isReloading = false;
     private UIManager UI = null;
 
+    public bool hasCoin = false;
+
     // Start is called before the first frame update
     void Start()
     {
