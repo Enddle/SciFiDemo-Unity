@@ -13,11 +13,13 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject hitMarker = null;
     [SerializeField] private AudioSource weaponSound = null;
     [SerializeField] private int currentAmmo = 0;
+    [SerializeField] private GameObject weapon = null;
     private int maxAmmo = 50;
     private bool isReloading = false;
     private UIManager UI = null;
 
     public bool hasCoin = false;
+    private bool canFire = false;
 
     // Start is called before the first frame update
     void Start()
@@ -67,7 +69,7 @@ public class Player : MonoBehaviour
 
     private void Shoot() {
 
-        if (Input.GetMouseButton(0) && currentAmmo > 0) {
+        if (Input.GetMouseButton(0) && currentAmmo > 0 && canFire) {
 
             currentAmmo--;
 
@@ -93,6 +95,11 @@ public class Player : MonoBehaviour
                     // get hit memory address
                 
                 Destroy(hit, 2.0f);
+
+                Destructible crate = hitInfo.transform.GetComponent<Destructible>();
+                if (crate != null) {
+                    crate.DestoryCrate();
+                }
             }
         } else {
             
@@ -110,5 +117,11 @@ public class Player : MonoBehaviour
         currentAmmo = maxAmmo;
         UI.UpdateAmmo(currentAmmo);
         isReloading = false;
+    }
+
+    public void EnableWeapon() {
+        
+        canFire = true;
+        weapon.SetActive(true);
     }
 }
